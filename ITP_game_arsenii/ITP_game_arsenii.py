@@ -29,14 +29,31 @@ PADDLE_COLOR = (0, 255, 200)
 BALL_COLOR = (255, 215, 0)
 
 
-class Paddle:
+
+class GameObject:
+    def __init__(self, x, y, width, height, color):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.color = color
+
+    def draw(self, screen):
+        
+        pygame.draw.rect(screen, self.color, self.rect)
+
+
+
+
+
+
+class Paddle(GameObject):
     def __init__(self):
-        self.width = 120
-        self.height = 15
-        self.x = WIDTH // 2 - self.width // 2
-        self.y = HEIGHT - 40
-        self.speed = 8
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        
+        paddle_width = 180
+        paddle_height = 15
+        x = WIDTH // 2 - paddle_width // 2
+        y = HEIGHT - 50
+        
+        super().__init__(x, y, paddle_width, paddle_height, PADDLE_COLOR)
+        self.speed = 12  
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -46,45 +63,38 @@ class Paddle:
             self.rect.x += self.speed
 
     def draw(self, screen):
-        pygame.draw.rect(screen, PADDLE_COLOR, self.rect, border_radius=4)
+       
+        pygame.draw.rect(screen, self.color, self.rect, border_radius=4)
 
 
-class Ball:
+class Ball(GameObject):
     def __init__(self):
         self.radius = 10
-        self.x = WIDTH // 2
-        self.y = HEIGHT // 2
-        self.speed_x = random.choice([-4, 4])
-        self.speed_y = -4
-        self.rect = pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius * 2, self.radius * 2)
+        x = WIDTH // 2
+        y = HEIGHT // 2 + 100
+        
+        
+        super().__init__(x - self.radius, y - self.radius, self.radius * 2, self.radius * 2, BALL_COLOR)
+        
+        self.speed_x = random.choice([-6, 6])
+        self.speed_y = -6
 
     def move(self):
-        
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
-
-        
         if self.rect.left <= 0 or self.rect.right >= WIDTH:
             self.speed_x = -self.speed_x
-
-        
         if self.rect.top <= 0:
             self.speed_y = -self.speed_y
 
     def draw(self, screen):
-        pygame.draw.circle(screen, BALL_COLOR, self.rect.center, self.radius)
+        
+        pygame.draw.circle(screen, self.color, self.rect.center, self.radius)
 
 
-class Block:
+class Block(GameObject):
     def __init__(self, x, y, width, height, color):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.color = color
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect, border_radius=3)
-
-
-
+        super().__init__(x, y, width, height, color)
 
 
 
@@ -149,8 +159,8 @@ class Game:
         self.blocks = []
 
        
-        block_width = 100
-        block_height = 40
+        block_width = 150
+        block_height = 50
         padding = 8
         offset_top = 80
         offset_left = 13
