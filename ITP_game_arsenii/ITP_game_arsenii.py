@@ -3,7 +3,7 @@ import sys
 import json
 import os
 import random
-from config import WIDTH, HEIGHT, FPS, WHITE, BLACK, DARK_BG, GAME_BG, BUTTON_COLOR, BUTTON_HOVER
+
 
 pygame.init();
 WIDTH, HEIGHT = 1600, 900
@@ -77,8 +77,8 @@ class Ball(GameObject):
         
         super().__init__(x - self.radius, y - self.radius, self.radius * 2, self.radius * 2, BALL_COLOR)
         
-        self.speed_x = random.choice([-6, 6])
-        self.speed_y = -6
+        self.speed_x = random.choice([-5, 5])
+        self.speed_y = -4
 
     def move(self):
         self.rect.x += self.speed_x
@@ -123,7 +123,8 @@ class Game:
         self.score = 0
         self.high_score = self.load_high_score() 
         self.paddle = None
-        self.ball = None
+        self.balls = []
+        
         self.blocks = []
 
     
@@ -158,6 +159,7 @@ class Game:
         self.paddle = Paddle()
         self.ball = Ball()
         self.blocks = []
+        self.balls = [Ball()]
 
        
         block_width = 150
@@ -221,31 +223,36 @@ class Game:
         
         if self.state == "GAME":
             self.paddle.move()
-            self.ball.move()
+            for ball in self.balls[:]:
+                ball.move()
 
-            # ball paddle
-            if self.ball.rect.colliderect(self.paddle.rect):
-                
-                if self.ball.speed_y > 0:
-                    self.ball.speed_y = -self.ball.speed_y
+                # ball paddle
+                if ball.rect.colliderect(self.paddle.rect):
+                    if ball.speed_y > 0:
+                        ball.speed_y = -ball.speed_y
 
-            # bll block
-            for block in self.blocks[:]: 
-                if self.ball.rect.colliderect(block.rect):
-                    self.ball.speed_y = -self.ball.speed_y 
-                    self.blocks.remove(block)             
-                    self.score += random.randint(8, 12) 
-                    
-                    break                                 
+                # bll block
+                for block in self.blocks[:]: 
+                    if ball.rect.colliderect(block.rect):
+                        ball.speed_y = -ball.speed_y 
+                        self.blocks.remove(block)             
+                        self.score += random.randint(8, 12) 
+                        temp = random.randint(1,6);
+                        if temp == 1:
+                            self.balls.append(Ball())
+                        temp= 0
+                        break                               
 
             
-            if self.ball.rect.bottom >= HEIGHT:
-                self.ball
-
+                if ball.rect.bottom >= HEIGHT:
+                    self.balls.remove(ball)
+                    if not self.balls:
+                        self.check_and_update_highscore()
+                        self.state = "GAMEOVER"
             
-            if not self.blocks:
-                self.check_and_update_highscore()
-                self.state = "GAMEOVER"
+                if not self.blocks:
+                    self.check_and_update_highscore()
+                    self.state = "GAMEOVER"
 
     def draw(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -286,7 +293,8 @@ class Game:
             
            
             self.paddle.draw(self.screen)
-            self.ball.draw(self.screen)
+            for ball in self.balls:
+                ball.draw(self.screen)
             for block in self.blocks:
                 block.draw(self.screen)
 
