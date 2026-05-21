@@ -3,6 +3,7 @@ import sys
 import json
 import os
 import random
+from config import WIDTH, HEIGHT, FPS, WHITE, BLACK, DARK_BG, GAME_BG, BUTTON_COLOR, BUTTON_HOVER
 
 pygame.init();
 WIDTH, HEIGHT = 1600, 900
@@ -233,13 +234,13 @@ class Game:
                 if self.ball.rect.colliderect(block.rect):
                     self.ball.speed_y = -self.ball.speed_y 
                     self.blocks.remove(block)             
-                    self.score += 10                      
+                    self.score += random.randint(8, 12) 
+                    
                     break                                 
 
             
             if self.ball.rect.bottom >= HEIGHT:
-                self.check_and_update_highscore()
-                self.state = "GAMEOVER"
+                self.ball
 
             
             if not self.blocks:
@@ -280,7 +281,7 @@ class Game:
             self.screen.fill(GAME_BG)
             
             
-            score_text = self.font_ui.render(f"Счет: {self.score}", True, WHITE)
+            score_text = self.font_ui.render(f"Score: {self.score}", True, WHITE)
             self.screen.blit(score_text, (20, 20))
             
            
